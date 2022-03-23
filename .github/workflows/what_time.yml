@@ -5,3 +5,13 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - run: date
+    job2:
+        runs-on ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2- uses: actions/checkout@v2
+
+            - name: Set output
+              id: vars
+              run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
+
+            - run:  du -skh --exclude=".git"
