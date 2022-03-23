@@ -1,3 +1,6 @@
 on:
     push:
-        run:date
+        jobs:
+            my_first_jobs:
+                steps:
+                    run: date
