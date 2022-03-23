@@ -2,7 +2,7 @@ name : saluuuut
 on: [push]
 jobs:
     job2:
-        runs-on ubuntu-latest
+        runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
               with:
