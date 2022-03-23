@@ -1,4 +1,7 @@
-on: push
+name : saluuuut
+on: [push]
 jobs:
-    steps:
-        - run: date
+    job1:
+        runs-on: ubuntu-latest
+        steps:
+            - run: date
