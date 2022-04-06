@@ -15,6 +15,7 @@ jobs:
       - name: "list files"
         run: |
           VAR=$(find ../../ -name ".o" -or -name ".a" -or -name "~" -or -name "pain_au_chocolat" -or -name "#" -or -name ".so" -or -name ".gcno" -or -name ".gcda" -or -name ".gcov")
+          echo"$VAR"
           if ["$VAR" != ""]; then
             exit 1
           fi
