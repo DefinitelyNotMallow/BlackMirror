@@ -15,4 +15,4 @@ jobs:
             git@github.com:EpitechPromo2026/B-DOP-200-STG-2-1-chocolatine-julian.lambert.git
           ssh_private_key:                             # <-- use 'secrets' to pass credential information.
             ${{ secrets.PRIVATE_SSH }}
-#tamerejeveuxcommit
+#tamerejeveuxcommitSALOPE
