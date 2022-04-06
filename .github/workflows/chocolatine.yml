@@ -1,8 +1,24 @@
-name: Mirroring
+name: Chocolatine
 
 on: [push, delete]
+env:
+  MIRROR_URL: git@github.com:EpitechPromo2026/B-DOP-200-STG-2-1-chocolatine-julian.lambert.git
 
 jobs:
+  check_repository_cleanliness:
+    runs-on: ubuntu-latest
+    steps:
+      - name:"checkout"
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: "list files"
+        run: |
+          VAR=find . -name ".o" -or -name ".a" -or -name "~" -or -name "pain_au_chocolat"
+          -or -name "#" -or -name ".so" -or -name ".gcno" -or -name ".gcda" -or -name ".gcov"
+          if [[VAR != 0]]; then
+            exit 1
+          fi
   to_gitlab:
     runs-on: ubuntu-latest
     steps:                                              # <-- must use actions/checkout before mirroring!
@@ -12,7 +28,7 @@ jobs:
       - uses: pixta-dev/repository-mirroring-action@v1
         with:
           target_repo_url:
-            git@github.com:EpitechPromo2026/B-DOP-200-STG-2-1-chocolatine-julian.lambert.git
+            MIRROR_URL
           ssh_private_key:                             # <-- use 'secrets' to pass credential information.
             ${{ secrets.PRIVATE_SSH_KEY }}
 
