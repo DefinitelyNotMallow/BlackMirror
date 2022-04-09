@@ -1,34 +1,83 @@
-name: Chocolatine
+name: repository_mirroring
 
 on: [push, delete]
+
 env:
   MIRROR_URL: git@github.com:EpitechPromo2026/B-DOP-200-STG-2-1-chocolatine-julian.lambert.git
+  EXECUTABLES: "chocolatine"
 
 jobs:
   check_repository_cleanliness:
+    runs-on: ubuntu-latest
+    name: "Checks if the repository is clean and void of any unwanted files (temp files, binary files, etc.)"
+    steps:
+      - name: "checkout"
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: "check all files"
+        run: |
+          VAR=$(find -name "*.o" -or -name "*.a" -or -name "*~" -or -name "*pain_au_chocolat*" -or -name "#*" -or -name "*.so" -or -name "*.gcno" -or -name "*.gcda" -or -name "*.gcov")
+          if [[ -n "$VAR" ]]; then
+            FILES=$(echo $VAR | tr "\n" "\n")
+            for i in $FILES
+            do
+              echo "::error file=${i#./},title=Unwanted file detected::${i#./}"
+            done
+            exit 1
+          fi
+
+  check_program_compilation:
+    needs: check_repository_cleanliness
+    runs-on: ubuntu-latest
+    container:
+      image: epitechcontent/epitest-docker:latest
+    steps:
+      - name: "checkout"
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: "try to compil"
+        run: |
+          make
+        timeout-minutes: 2
+      - run: |
+          make clean
+          OIFS=$IFS
+          IFS=','
+          for x in $EXECUTABLES;
+            do
+              ./$x
+            done
+          IFS=$OIFS
+
+  run_tests:
+    needs: check_program_compilation
+    runs-on: ubuntu-latest
+    container:
+      image: epitechcontent/epitest-docker:latest
+    steps:
+      - name: "checkout"
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: "check complilation"
+        run: |
+          make run_tests
+        timeout-minutes: 2
+
+  to_github:
+    needs: run_tests
     runs-on: ubuntu-latest
     steps:
       - name: "checkout"
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: "list files"
-        run: |
-          VAR=$(find ../../ -name ".o" -or -name ".a" -or -name "~" -or -name "pain_au_chocolat" -or -name "#" -or -name ".so" -or -name ".gcno" -or -name ".gcda" -or -name ".gcov")
-          echo"$VAR"
-          if ["$VAR" != ""]
-            exit 1
-          fi
-  to_gitlab:
-    runs-on: ubuntu-latest
-    steps:                                              # <-- must use actions/checkout before mirroring!
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - uses: pixta-dev/repository-mirroring-action@v1
+      - name: "mirroring"
+        uses: pixta-dev/repository-mirroring-action@v1
         with:
           target_repo_url:
-            git@github.com:EpitechPromo2026/B-DOP-200-STG-2-1-chocolatine-julian.lambert.git
-          ssh_private_key:                       # <-- use 'secrets' to pass credential information.
-            ${{ secrets.PRIVATE_SSH_KEY }}
-
+            ${{ env.MIRROR_URL }}
+          ssh_private_key:
+            ${{ secrets.GIT_SSH_PRIVATE_KEY }}
