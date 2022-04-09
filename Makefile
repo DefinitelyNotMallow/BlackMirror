@@ -29,7 +29,7 @@ ICYAN   = $ \x1b[46m
 IWHITE  = $ \x1b[47m
 
 SRC	=	main.c	\
-		my_strlen.c
+		is_even.c
 
 TEST_FILES =	test_is_even.c	\
 				is_even.c	\
